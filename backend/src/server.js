@@ -17,7 +17,8 @@ const paymentRoutes = require('./routes/payment.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 
 const app = express();
-
+const migrationRoutes = require('./routes/migration.routes');
+app.use('/api/migration', migrationRoutes);
 // Security middleware
 app.use(helmet());
 
@@ -100,11 +101,10 @@ const startServer = async () => {
     logger.info('Database connection established successfully');
 
     // Sync database (use migrations in production)
-    if (process.env.NODE_ENV !== 'production') {
-      await sequelize.sync({ alter: true });
-      logger.info('Database synchronized');
-    }
-
+    
+logger.info('Running database migrations...');
+await sequelize.sync({ alter: true });
+logger.info('✅ Database migrations completed successfully');
     // Start server
     app.listen(PORT, () => {
       logger.info(`🚀 PropBot AI Backend running on port ${PORT}`);
